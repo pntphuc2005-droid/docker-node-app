@@ -5,8 +5,13 @@ const path = require("path");
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
+  // ❌ tránh lỗi favicon
+  if (req.url === "/favicon.ico") {
+    res.writeHead(204);
+    return res.end();
+  }
 
-  // 👉 xử lý logo
+  // ✅ xử lý ảnh logo
   if (req.url === "/logo.png") {
     const filePath = path.join(__dirname, "public", "Logo_VLU_2022.png");
 
@@ -22,7 +27,13 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 👉 HTML
+  // ❌ route khác → 404
+  if (req.url !== "/") {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    return res.end("404 Not Found");
+  }
+
+  // ✅ HTML chính
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
 
   res.end(`
@@ -55,11 +66,6 @@ const server = http.createServer((req, res) => {
         width: 550px;
       }
 
-      .header {
-        text-align: center;
-        margin-bottom: 10px;
-      }
-
       .logo {
         width: 140px;
         margin-bottom: 15px;
@@ -67,7 +73,7 @@ const server = http.createServer((req, res) => {
 
       h1 {
         color: #e53935;
-        font-size: 36px;
+        font-size: 34px;
         margin: 0;
       }
 
@@ -90,20 +96,16 @@ const server = http.createServer((req, res) => {
       .member h2 {
         margin: 5px 0;
       }
-
     </style>
   </head>
 
   <body>
-
     <div class="container">
       <div class="card">
 
-        <div class="header">
-          <img src="/logo.png" class="logo" />
-          <h1>Welcome to Văn Lang University</h1>
-        </div>
+        <img src="/logo.png" class="logo" />
 
+        <h1>Welcome to Văn Lang University</h1>
         <h3>Lớp: 252_71ITDS30103_0102</h3>
 
         <hr/>
@@ -120,13 +122,12 @@ const server = http.createServer((req, res) => {
 
       </div>
     </div>
-
   </body>
   </html>
   `);
 });
 
-// ✅ CHẠY SERVER (QUAN TRỌNG CHO RENDER)
+// ✅ chạy server
 server.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
